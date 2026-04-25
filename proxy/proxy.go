@@ -1,10 +1,11 @@
 package proxy
 
 import (
-	"loadbalancer/balancer"
 	"log"
 	"net/http"
 	"net/http/httputil"
+
+	"loadbalancer/balancer"
 )
 
 type Proxy struct {
@@ -16,12 +17,16 @@ func NewProxy(lb *balancer.LoadBalancer) *Proxy {
 }
 
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	backend := p.lb.Next()
+	backend := p.lb.Next(r)
 
 	if backend == nil {
 		http.Error(w, "No backend available", http.StatusServiceUnavailable)
 		return
 	}
+
+	// Track connections
+	backend.IncrementConnections()
+	defer backend.DecrementConnections()
 
 	proxy := httputil.NewSingleHostReverseProxy(backend.URL)
 

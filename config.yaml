@@ -1,5 +1,6 @@
-port : ":8080"
-strategy : "round_robin"
-backends : 
-  -url : "http://localhost:8081"
-  -url : "http://localhost:8082"
+port: ":8080"
+strategy: "round_robin"   # options: round_robin, least_conn, ip_hash
+
+backends:
+  - url: "http://localhost:8081"
+  - url: "http://localhost:8082"

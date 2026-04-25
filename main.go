@@ -21,10 +21,13 @@ func main() {
 		urls = append(urls, b.URL)
 	}
 
-	lb := balancer.NewLoadBalancer(urls)
+	lb := balancer.NewLoadBalancer(urls, cfg.Strategy)
+
+	// Start health checks
+	go health.StartHealthCheck(lb.GetBackends())
+
 	proxy := proxy.NewProxy(lb)
 
 	log.Println("Load balancer running on", cfg.Port)
 	http.ListenAndServe(cfg.Port, proxy)
-	go health.StartHealthCheck(lb.GetBackends())
 }
