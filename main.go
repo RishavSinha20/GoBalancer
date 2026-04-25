@@ -6,6 +6,7 @@ import (
 
 	"loadbalancer/balancer"
 	"loadbalancer/config"
+	"loadbalancer/health"
 	"loadbalancer/proxy"
 )
 
@@ -25,4 +26,5 @@ func main() {
 
 	log.Println("Load balancer running on", cfg.Port)
 	http.ListenAndServe(cfg.Port, proxy)
+	go health.StartHealthCheck(lb.GetBackends())
 }
