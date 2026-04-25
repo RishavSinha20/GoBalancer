@@ -1,11 +1,12 @@
 package proxy
 
 import (
+	"loadbalancer/balancer"
+	"loadbalancer/metrics"
 	"log"
 	"net/http"
 	"net/http/httputil"
-
-	"loadbalancer/balancer"
+	"time"
 )
 
 type Proxy struct {
@@ -17,25 +18,38 @@ func NewProxy(lb *balancer.LoadBalancer) *Proxy {
 }
 
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	backend := p.lb.Next(r)
+	metrics.IncRequests()
 
-	if backend == nil {
-		http.Error(w, "No backend available", http.StatusServiceUnavailable)
-		return
+	maxRetries := 3
+
+	for i := 0; i < maxRetries; i++ {
+		backend := p.lb.Next(r)
+
+		if backend == nil {
+			break
+		}
+
+		backend.IncrementConnections()
+		proxy := httputil.NewSingleHostReverseProxy(backend.URL)
+		errorOccurred := false
+
+		proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+			log.Println("Error :", err)
+			errorOccurred = true
+		}
+
+		proxy.ServeHTTP(w, r)
+
+		backend.DecrementConnections()
+
+		if !errorOccurred {
+			return
+		}
+
+		log.Println("Retrying request....")
+		time.Sleep(100 * time.Millisecond)
 	}
 
-	// Track connections
-	backend.IncrementConnections()
-	defer backend.DecrementConnections()
-
-	proxy := httputil.NewSingleHostReverseProxy(backend.URL)
-
-	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
-		log.Println("Proxy error:", err)
-		http.Error(w, "Service unavailable", http.StatusServiceUnavailable)
-	}
-
-	log.Println("Forwarding request to:", backend.URL)
-
-	proxy.ServeHTTP(w, r)
+	metrics.IncFailures()
+	http.Error(w, "Service unavailable", http.StatusServiceUnavailable)
 }
