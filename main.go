@@ -16,10 +16,7 @@ import (
 )
 
 func main() {
-	cfg, err := config.LoadConfig("config.yaml")
-	if err != nil {
-		log.Fatal(err)
-	}
+	cfg, _ := config.LoadConfig("config.yaml")
 
 	var urls []string
 	for _, b := range cfg.Backends {
@@ -32,9 +29,7 @@ func main() {
 
 	proxy := proxy.NewProxy(lb)
 
-	// Rate limiter
 	rl := middleware.NewRateLimiter(10)
-
 	handler := rl.Middleware(proxy)
 
 	server := &http.Server{
@@ -44,23 +39,21 @@ func main() {
 
 	go func() {
 		log.Println("Server running on", cfg.Port)
-		if err := server.ListenAndServe(); err != nil {
-			log.Println("Server stopped:", err)
+
+		// HTTPS support
+		err := server.ListenAndServeTLS("cert.pem", "key.pem")
+		if err != nil {
+			log.Println(err)
 		}
 	}()
 
-	// Graceful shutdown
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
 
 	<-stop
 
-	log.Println("Shutting down server...")
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	server.Shutdown(ctx)
-
-	log.Println("Server exited")
 }
