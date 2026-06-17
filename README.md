@@ -192,7 +192,7 @@ ip_hash
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/goloadbalancer.git
+git clone https://github.com/RishavSinha20/goloadbalancer.git
 
 cd goloadbalancer
 ```
