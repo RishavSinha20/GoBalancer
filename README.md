@@ -34,6 +34,41 @@ The project was built to understand how modern traffic management systems such a
 ```
 
 ---
+# Project Structure
+
+```text
+loadbalancer/
+│
+├── balancer/
+│   ├── backend.go
+│   └── balancer.go
+│
+├── proxy/
+│   └── proxy.go
+│
+├── health/
+│   └── health.go
+│
+├── middleware/
+│   └── ratelimiter.go
+│
+├── metrics/
+│   └── metrics.go
+│
+├── cache/
+│   └── cache.go
+│
+├── config/
+│   ├── config.go
+│   └── watcher.go
+│
+├── main.go
+├── go.mod
+├── go.sum
+└── config.yaml
+```
+
+---
 
 # Features
 
@@ -80,41 +115,7 @@ The project was built to understand how modern traffic management systems such a
 
 ---
 
-# Project Structure
 
-```text
-loadbalancer/
-│
-├── balancer/
-│   ├── backend.go
-│   └── balancer.go
-│
-├── proxy/
-│   └── proxy.go
-│
-├── health/
-│   └── health.go
-│
-├── middleware/
-│   └── ratelimiter.go
-│
-├── metrics/
-│   └── metrics.go
-│
-├── cache/
-│   └── cache.go
-│
-├── config/
-│   ├── config.go
-│   └── watcher.go
-│
-├── main.go
-├── go.mod
-├── go.sum
-└── config.yaml
-```
-
----
 
 # Routing Strategies
 
