@@ -431,35 +431,4 @@ Cons:
 
 ---
 
-# Future Improvements
 
-* Prometheus integration
-* Grafana dashboards
-* Docker deployment
-* Circuit breaker implementation
-* Consistent hashing ring
-* Distributed load balancer cluster
-* Kubernetes deployment
-* Dynamic service discovery
-
----
-
-# Key Learnings
-
-This project provided hands-on experience with:
-
-* Reverse proxy internals
-* Concurrent programming with goroutines
-* Synchronization primitives
-* Health monitoring systems
-* Runtime state management
-* Fault-tolerant architecture
-* Infrastructure observability
-* Load balancing algorithms
-* Production-oriented backend design
-
----
-
-# Resume Summary
-
-Built a production-style Layer 7 Load Balancer in Go supporting multiple routing strategies, active health checks, automatic failover, retry logic, rate limiting, caching, observability, and graceful shutdown capabilities.
